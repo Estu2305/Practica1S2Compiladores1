@@ -55,7 +55,6 @@ public class Archivos extends javax.swing.JFrame {
         btnCargar = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
         btnNuevo = new javax.swing.JButton();
-        btnImportar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -104,11 +103,13 @@ public class Archivos extends javax.swing.JFrame {
         });
         getContentPane().add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 190, 100, -1));
 
-        btnImportar.setText("Importar");
-        getContentPane().add(btnImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 220, 100, -1));
-
         btnLimpiar.setText("Limpiar");
-        getContentPane().add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 250, 100, -1));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 230, 100, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Fondo/4819735.jpg"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 1160, 610));
@@ -347,6 +348,11 @@ public class Archivos extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenu3ActionPerformed
 
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+         txtArchivo.setText("");  // Limpiar el JTextArea cuando se presiona el botón
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -389,7 +395,6 @@ public class Archivos extends javax.swing.JFrame {
     private javax.swing.JButton btnCargar;
     private javax.swing.JButton btnCompilar;
     private javax.swing.JButton btnGuardar;
-    private javax.swing.JButton btnImportar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnNuevo;
     private javax.swing.JLabel jLabel1;
