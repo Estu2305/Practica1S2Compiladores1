@@ -1,0 +1,109 @@
+package Analisis;
+
+import java_cup.runtime.*;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.awt.Color;
+import Moldear.*;
+import Excepciones.Errores;
+
+parser code 
+{:
+   public static ArrayList<Forma> formas = new ArrayList<>();
+
+   public static LinkedList<Errores> listaErrores = new LinkedList<>();
+
+  public void syntax_error (Symbol s){
+   listaErrores.add(new Errores("SINTACTICO RECUPERABLE", "No se esperaba el componente " + s.value, s.left, s.right));
+   
+  }
+
+  public void unrecovered_syntax_error (Symbol s){
+   listaErrores.add(new Errores("SINTACTICO No RECUPERABLE", "No se esperaba el componente " + s.value, s.left, s.right));   
+  }
+
+:}
+
+action code 
+{:
+    private Color getColor(String colorName) {
+    switch (colorName.toLowerCase()) {
+        case "fusia": return new Color(255, 0, 255);  // Fucsia
+        case "turquesa": return new Color(64, 224, 208);  // Turquesa
+        case "gris": return new Color(128, 128, 128);  // Gris
+        case "naranja": return new Color(255, 165, 0);  // Naranja
+        case "morado": return new Color(128, 0, 128);  // Morado
+        case "verde": return new Color(0, 255, 0);  // Verde
+        case "amarillo": return new Color(255, 255, 0);  // Amarillo
+        case "rojo": return new Color(255, 0, 0);  // Rojo
+        case "azul": return new Color(0, 0, 255);  // Azul
+        default: return Color.BLACK;  // Color por defecto
+    }
+}
+:}
+
+//Terminales
+terminal GRAFICAR, CIRCULO, CUADRADO, RECTANGULO, LINEA, POLIGONO, ANIMAR, OBJETO, ANTERIOR, OBJETO_ANTERIOR;
+terminal String COLOR, ANIMAR_TIPO_LINEAL, ANIMAR_TIPO_CURVA, LINEAL, CURVA;
+terminal SUMA, RESTA, MULTIPLICACION, DIVISION, PAR1, PAR2, COMA;
+terminal String ID;
+terminal Integer ENTERO;
+terminal Double DECIMAL;
+
+//NO Terminal
+non terminal ArrayList<Forma> program;
+non terminal Forma shape;
+non terminal statement, animar;
+non terminal Double expresion;
+
+precedence left SUMA, RESTA;
+precedence left MULTIPLICACION, DIVISION;
+precedence left PAR1, PAR2;
+
+
+program ::= statement program
+          | statement
+          {:
+            System.out.println("Añadiendo forma al programa");  
+           RESULT = parser.formas; 
+           :}
+          ;
+
+statement ::= shape:f PAR2
+            {: parser.formas.add(f); :}
+            | animar PAR2
+            ;
+
+shape ::= GRAFICAR CIRCULO PAR1 ID:id COMA expresion:x COMA expresion:y COMA  expresion:r COMA COLOR:c PAR2
+         {: 
+          System.out.println("Producción Círculo detectada con ID: " + id + " y color: " + c);
+          RESULT = new Circulo(id, (int)Math.round(x), (int)Math.round(y), (int)Math.round(r), getColor(c)); 
+         :}
+         | GRAFICAR CUADRADO PAR1 ID:id COMA expresion:x COMA expresion:y COMA expresion:l COMA COLOR:c PAR2
+         {: RESULT = new Cuadrado(id, (int)Math.round(x), (int)Math.round(y), (int)Math.round(l), getColor(c)); 
+         :}
+         | GRAFICAR RECTANGULO PAR1 ID:id COMA expresion:x COMA expresion:y COMA expresion:w COMA expresion:h COMA COLOR:c PAR2
+         {: RESULT = new Rectangulo(id, (int)Math.round(x), (int)Math.round(y), (int)Math.round(w), (int)Math.round(h), getColor(c)); 
+         :}
+         | GRAFICAR LINEA PAR1 ID:id COMA expresion:x1 COMA expresion:y1 COMA expresion:x2 COMA expresion:y2 COMA COLOR:c PAR2
+         {: RESULT = new Linea(id, (int)Math.round(x1), (int)Math.round(y1), (int)Math.round(x2), (int)Math.round(y2), getColor(c)); 
+         :}
+         | GRAFICAR POLIGONO PAR1 ID:id COMA expresion:x COMA expresion:y COMA expresion:s COMA expresion:w COMA expresion:h COMA COLOR:c PAR2
+         {:
+           int[] puntosX = { (int)Math.round(x), (int)Math.round(x + s), (int)Math.round(x + s), (int)Math.round(x) };
+           int[] puntosY = { (int)Math.round(y), (int)Math.round(y), (int)Math.round(y + h), (int)Math.round(y + h) };
+
+           RESULT = new Poligono(id, puntosX, puntosY, 4, (int)Math.round(x), (int)Math.round(y), getColor(c));
+         :}
+;
+
+//ANIIMACION
+
+expresion ::= ENTERO:e {: RESULT = e.doubleValue(); :}
+            | DECIMAL:d {: RESULT = d; :}
+            | expresion:e1 SUMA expresion:e2 {: RESULT = e1 + e2; :}
+            | expresion:e1 RESTA expresion:e2 {: RESULT = e1 - e2; :}
+            | expresion:e1 MULTIPLICACION expresion:e2 {: RESULT = e1 * e2; :}
+            | expresion:e1 DIVISION expresion:e2 {: RESULT = e1 / e2; :}
+            | PAR1 expresion:e PAR2 {: RESULT = e; :}
+;
